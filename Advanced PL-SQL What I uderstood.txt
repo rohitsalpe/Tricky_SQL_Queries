@@ -1,0 +1,101 @@
+
+175. Combine Two Tables (Easy)
+
+SELECT p.FirstName, p.LastName, a.City, a.State FROM
+Person p LEFT JOIN Address a
+ON p.PersonId = a.PersonId;
+
+176. Second Highest Salary
+SELECT Max(Salary) As SecondHighestSalary FROM Employee WHERE
+Salary < (SELECT MAX(Salary) FROM Employee);
+
+177. Nth Highest Salary
+CREATE FUNCTION getNthHighestSalary(N IN NUMBER) RETURN NUMBER IS
+result NUMBER;
+BEGIN
+    /* Write your PL/SQL query statement below */
+    SELECT  Salary INTO result
+    FROM (
+           SELECT distinct Salary, dense_rank() over(order by Salary desc) as
+           denseRank FROM Employee e
+         )
+     where denseRank = N;
+
+    RETURN result;
+END;
+
+181. Employees Earning More Than Their Managers
+
+SELECT e1.Name AS Employee FROM Employee e1, Employee e2
+WHERE e1.ManagerId = e2.Id AND e1.Salary > e2.Salary;
+
+182. Duplicate Emails
+/* Write your PL/SQL query statement below */
+SELECT Email FROM (SELECT (Email), Count(*) from Person
+GROUP BY Email
+HAVING COUNT(*) > 1);
+
+183. Customers Who Never Order
+select Customers from
+(SELECT c.Name as Customers, o.CustomerId FROM
+Customers c, Orders o
+WHERE c.Id = o.CustomerID(+)
+and o.customerid is null);
+
+196. Delete Duplicate Emails
+
+DELETE p1 FROM Person p1, Person p2
+WHERE p1.Email = p2.Email AND p1.Id > p2.Id;
+
+197. Rising Temperature
+SELECT w1.Id from Weather w1, Weather w2
+WHERE w1.Temperature > w2.Temperature AND
+w2.RecordDate = w1.RecordDate-1;
+
+178. Rank Scores
+SELECT Score, dense_rank() over(order by Score desc) as
+Rank FROM Scores;
+
+180. Consecutive Numbers
+SELECT DISTINCT num as ConsecutiveNums from Logs l
+WHERE l.num = (SELECT num from logs WHERE id = l.id+1)
+AND l.num = (SELECT num from logs WHERE id = l.id+2);
+
+184. Department Highest Salary
+SELECT d.Name AS Department, e.Name as Employee, e.Salary
+FROM Department d, Employee e
+WHERE e.DepartmentId = d.Id
+AND (e.DepartmentId , e.Salary) IN
+(SELECT c.Id, MAX(a.Salary)
+                FROM Employee a, Department c
+                WHERE a.DepartmentId = c.Id
+                GROUP BY c.Id)
+
+574. Winning Candidate
+select c.Name 
+from CANDIDATE c, (select CANDIDATEID from (
+select CANDIDATEID,count(CandidateId) from VOTE 
+                   group by CandidateId
+                   order by count(CandidateId) DESC)
+ where rownum = 1 ) t 
+ where c.ID = t.CANDIDATEID;
+
+---Max count query:
+
+select shipment_method_id, shipment_description, count(*) as num_orders
+  from orders
+  join shipment_method
+ using (shipment_method_id)
+ group by shipment_method_id, shipment_description
+having count(*) = (select max(count(order_id))
+                     from orders
+                    group by shipment_method_id)
+
+
+Write an SQL query that reports all the projects that have the most employees.
+select project_id
+from Project 
+group by project_id
+having count(employee_id) = (select max(count(employee_id))
+                               from Project
+                               group by project_id)
