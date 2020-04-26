@@ -1,15 +1,21 @@
 
-175. Combine Two Tables (Easy)
+175. Combine Two Tables (Easy):
 
 SELECT p.FirstName, p.LastName, a.City, a.State FROM
 Person p LEFT JOIN Address a
 ON p.PersonId = a.PersonId;
 
-176. Second Highest Salary
+*******************************************************************************
+
+176. Second Highest Salary:
+
 SELECT Max(Salary) As SecondHighestSalary FROM Employee WHERE
 Salary < (SELECT MAX(Salary) FROM Employee);
 
-177. Nth Highest Salary
+********************************************************************************
+
+177. Nth Highest Salary:
+
 CREATE FUNCTION getNthHighestSalary(N IN NUMBER) RETURN NUMBER IS
 result NUMBER;
 BEGIN
@@ -24,44 +30,66 @@ BEGIN
     RETURN result;
 END;
 
-181. Employees Earning More Than Their Managers
+********************************************************************************
+
+181. Employees Earning More Than Their Managers:
 
 SELECT e1.Name AS Employee FROM Employee e1, Employee e2
 WHERE e1.ManagerId = e2.Id AND e1.Salary > e2.Salary;
 
-182. Duplicate Emails
+********************************************************************************
+
+182. Duplicate Emails:
+
 /* Write your PL/SQL query statement below */
 SELECT Email FROM (SELECT (Email), Count(*) from Person
 GROUP BY Email
 HAVING COUNT(*) > 1);
 
-183. Customers Who Never Order
+********************************************************************************
+
+183. Customers Who Never Order: 
+
 select Customers from
 (SELECT c.Name as Customers, o.CustomerId FROM
 Customers c, Orders o
 WHERE c.Id = o.CustomerID(+)
 and o.customerid is null);
 
-196. Delete Duplicate Emails
+*******************************************************************************
+
+196. Delete Duplicate Emails: 
 
 DELETE p1 FROM Person p1, Person p2
 WHERE p1.Email = p2.Email AND p1.Id > p2.Id;
 
-197. Rising Temperature
+*******************************************************************************
+
+197. Rising Temperature: 
+
 SELECT w1.Id from Weather w1, Weather w2
 WHERE w1.Temperature > w2.Temperature AND
 w2.RecordDate = w1.RecordDate-1;
 
-178. Rank Scores
+*******************************************************************************
+
+178. Rank Scores:
+
 SELECT Score, dense_rank() over(order by Score desc) as
 Rank FROM Scores;
 
-180. Consecutive Numbers
+*******************************************************************************
+
+180. Consecutive Numbers:
+
 SELECT DISTINCT num as ConsecutiveNums from Logs l
 WHERE l.num = (SELECT num from logs WHERE id = l.id+1)
 AND l.num = (SELECT num from logs WHERE id = l.id+2);
 
-184. Department Highest Salary
+*******************************************************************************
+
+184. Department Highest Salary:
+
 SELECT d.Name AS Department, e.Name as Employee, e.Salary
 FROM Department d, Employee e
 WHERE e.DepartmentId = d.Id
@@ -71,14 +99,19 @@ AND (e.DepartmentId , e.Salary) IN
                 WHERE a.DepartmentId = c.Id
                 GROUP BY c.Id)
 
-574. Winning Candidate
-select c.Name
+*******************************************************************************
+
+574. Winning Candidate:
+
+select c.Name 
 from CANDIDATE c, (select CANDIDATEID from (
-select CANDIDATEID,count(CandidateId) from VOTE
+select CANDIDATEID,count(CandidateId) from VOTE 
                    group by CandidateId
                    order by count(CandidateId) DESC)
- where rownum = 1 ) t
+ where rownum = 1 ) t 
  where c.ID = t.CANDIDATEID;
+
+*******************************************************************************
 
 ---Max count query:
 
@@ -91,13 +124,133 @@ having count(*) = (select max(count(order_id))
                      from orders
                     group by shipment_method_id)
 
+*******************************************************************************
 
-Write an SQL query that reports all the projects that have the most employees.
+Write an SQL query that reports all the projects that have the most employees:
+
 select project_id
-from Project
+from Project 
 group by project_id
 having count(employee_id) = (select max(count(employee_id))
                                from Project
                                group by project_id)
 
-New test line.
+*******************************************************************************
+
+Write an SQL query to find the number of times each student attended each exam:
+
+select
+c.student_id,c.student_name,c.subject_name, sum(case when d.subject_name is null then 0 else 1 end) attended_exams
+from
+(
+select a.student_id,a.student_name,b.subject_name
+from students a, subjects b
+) c
+left outer join examinations d
+on c.student_id = d.student_id
+and c.subject_name = d.subject_name
+group by c.student_id,c.student_name,c.subject_name
+order by c.student_id,c.subject_name
+
+*******************************************************************************
+
+Write an SQL query to find the percentage of immediate orders in the first 
+orders of all customers, rounded to 2 decimal places:
+
+With
+t1 as 
+(SELECT count(distinct delivery_id) as num
+FROM delivery
+WHERE order_date = customer_pref_delivery_date
+AND (customer_id, order_date) IN
+(SELECT customer_id, min(order_date) as order_date
+                                  FROM Delivery
+                                  GROUP BY customer_id)),
+t2 as 
+(Select count(distinct customer_id) as den
+FROM delivery)
+
+select round(t1.num/t2.den * 100, 2) as immediate_percentage FROM t1,t2;
+
+*******************************************************************************
+
+Shortest Distance in a Line:
+
+SELECT
+    MIN(ABS(p1.x - p2.x)) AS shortest
+FROM
+    point p1
+        JOIN
+    point p2 ON p1.x != p2.x;
+
+*******************************************************************************
+
+Output all the names in the table salesperson, who didn’t have sales to company 'RED':
+
+SELECT s.name
+FROM salesperson s
+WHERE s.sales_id NOT IN (SELECT o.sales_id 
+                         FROM orders o, company c                 
+                         WHERE o.com_id = c.com_id(+)
+                         AND c.name = 'RED')
+
+*******************************************************************************
+
+Query the customer_number from the orders table for the customer who 
+has placed the largest number of orders:
+
+select customer_number from orders 
+group by customer_number
+having count(customer_number) >= all 
+(select count(customer_number) from orders group by customer_number);
+
+*******************************************************************************
+
+
+Write a SQL query that reports the device that is first logged in for each player:
+
+select player_id, device_id
+from
+(select distinct player_id, device_id, row_number() over(partition by 
+                                        player_id order by event_date asc) rk
+from Activity ) t
+where rk = 1
+
+*******************************************************************************
+
+Swap Salary:
+
+UPDATE salary
+SET sex = CASE sex
+        WHEN 'm' THEN 'f'
+        ELSE 'm'
+        END;
+
+*******************************************************************************
+
+Write an SQL query that reports the average experience years of all the 
+employees for each project, rounded to 2 digits:
+
+select p.project_id, round(avg(e.experience_years),2) as average_years
+from
+Project p, Employee e
+where p.employee_id = e.employee_id
+group by project_id
+
+*******************************************************************************
+
+Winning Candidate:
+
+select c.Name 
+from CANDIDATE c, (select CANDIDATEID from (
+select CANDIDATEID,count(CandidateId) from VOTE 
+                   group by CandidateId
+                   order by count(CandidateId) DESC)
+ where rownum = 1 ) t 
+ where c.ID = t.CANDIDATEID;
+
+
+
+
+
+
