@@ -72,12 +72,12 @@ AND (e.DepartmentId , e.Salary) IN
                 GROUP BY c.Id)
 
 574. Winning Candidate
-select c.Name 
+select c.Name
 from CANDIDATE c, (select CANDIDATEID from (
-select CANDIDATEID,count(CandidateId) from VOTE 
+select CANDIDATEID,count(CandidateId) from VOTE
                    group by CandidateId
                    order by count(CandidateId) DESC)
- where rownum = 1 ) t 
+ where rownum = 1 ) t
  where c.ID = t.CANDIDATEID;
 
 ---Max count query:
@@ -94,8 +94,10 @@ having count(*) = (select max(count(order_id))
 
 Write an SQL query that reports all the projects that have the most employees.
 select project_id
-from Project 
+from Project
 group by project_id
 having count(employee_id) = (select max(count(employee_id))
                                from Project
                                group by project_id)
+
+New test line.
