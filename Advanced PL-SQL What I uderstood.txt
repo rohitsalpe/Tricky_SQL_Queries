@@ -48,7 +48,7 @@ HAVING COUNT(*) > 1);
 
 ********************************************************************************
 
-183. Customers Who Never Order: 
+183. Customers Who Never Order:
 
 select Customers from
 (SELECT c.Name as Customers, o.CustomerId FROM
@@ -58,14 +58,14 @@ and o.customerid is null);
 
 *******************************************************************************
 
-196. Delete Duplicate Emails: 
+196. Delete Duplicate Emails:
 
 DELETE p1 FROM Person p1, Person p2
 WHERE p1.Email = p2.Email AND p1.Id > p2.Id;
 
 *******************************************************************************
 
-197. Rising Temperature: 
+197. Rising Temperature:
 
 SELECT w1.Id from Weather w1, Weather w2
 WHERE w1.Temperature > w2.Temperature AND
@@ -103,12 +103,12 @@ AND (e.DepartmentId , e.Salary) IN
 
 574. Winning Candidate:
 
-select c.Name 
+select c.Name
 from CANDIDATE c, (select CANDIDATEID from (
-select CANDIDATEID,count(CandidateId) from VOTE 
+select CANDIDATEID,count(CandidateId) from VOTE
                    group by CandidateId
                    order by count(CandidateId) DESC)
- where rownum = 1 ) t 
+ where rownum = 1 ) t
  where c.ID = t.CANDIDATEID;
 
 *******************************************************************************
@@ -129,7 +129,7 @@ having count(*) = (select max(count(order_id))
 Write an SQL query that reports all the projects that have the most employees:
 
 select project_id
-from Project 
+from Project
 group by project_id
 having count(employee_id) = (select max(count(employee_id))
                                from Project
@@ -154,11 +154,11 @@ order by c.student_id,c.subject_name
 
 *******************************************************************************
 
-Write an SQL query to find the percentage of immediate orders in the first 
+Write an SQL query to find the percentage of immediate orders in the first
 orders of all customers, rounded to 2 decimal places:
 
 With
-t1 as 
+t1 as
 (SELECT count(distinct delivery_id) as num
 FROM delivery
 WHERE order_date = customer_pref_delivery_date
@@ -166,7 +166,7 @@ AND (customer_id, order_date) IN
 (SELECT customer_id, min(order_date) as order_date
                                   FROM Delivery
                                   GROUP BY customer_id)),
-t2 as 
+t2 as
 (Select count(distinct customer_id) as den
 FROM delivery)
 
@@ -189,19 +189,19 @@ Output all the names in the table salesperson, who didn’t have sales to compan
 
 SELECT s.name
 FROM salesperson s
-WHERE s.sales_id NOT IN (SELECT o.sales_id 
-                         FROM orders o, company c                 
+WHERE s.sales_id NOT IN (SELECT o.sales_id
+                         FROM orders o, company c
                          WHERE o.com_id = c.com_id(+)
                          AND c.name = 'RED')
 
 *******************************************************************************
 
-Query the customer_number from the orders table for the customer who 
+Query the customer_number from the orders table for the customer who
 has placed the largest number of orders:
 
-select customer_number from orders 
+select customer_number from orders
 group by customer_number
-having count(customer_number) >= all 
+having count(customer_number) >= all
 (select count(customer_number) from orders group by customer_number);
 
 *******************************************************************************
@@ -211,7 +211,7 @@ Write a SQL query that reports the device that is first logged in for each playe
 
 select player_id, device_id
 from
-(select distinct player_id, device_id, row_number() over(partition by 
+(select distinct player_id, device_id, row_number() over(partition by
                                         player_id order by event_date asc) rk
 from Activity ) t
 where rk = 1
@@ -228,7 +228,7 @@ SET sex = CASE sex
 
 *******************************************************************************
 
-Write an SQL query that reports the average experience years of all the 
+Write an SQL query that reports the average experience years of all the
 employees for each project, rounded to 2 digits:
 
 select p.project_id, round(avg(e.experience_years),2) as average_years
@@ -241,16 +241,258 @@ group by project_id
 
 Winning Candidate:
 
-select c.Name 
+select c.Name
 from CANDIDATE c, (select CANDIDATEID from (
-select CANDIDATEID,count(CandidateId) from VOTE 
+select CANDIDATEID,count(CandidateId) from VOTE
                    group by CandidateId
                    order by count(CandidateId) DESC)
- where rownum = 1 ) t 
+ where rownum = 1 ) t
  where c.ID = t.CANDIDATEID;
 
+*******************************************************************************
+Write an SQL query that reports the first login date for each player:
+
+select player_id, device_id
+from
+(select distinct player_id, device_id, row_number() over(partition by player_id order by event_date asc) rk
+from Activity ) t
+where rk = 1
+
+*******************************************************************************
+Write an SQL query to reformat the table such that there is a department id column
+and a revenue column for each month:
+
+select
+    d.id,
+    min(case when d.month = 'Jan' then d.revenue else null end) "Jan_Revenue",
+    min(case when d.month = 'Feb' then d.revenue else null end) "Feb_Revenue",
+    min(case when d.month = 'Mar' then d.revenue else null end) "Mar_Revenue",
+    min(case when d.month = 'Apr' then d.revenue else null end) "Apr_Revenue",
+    min(case when d.month = 'May' then d.revenue else null end) "May_Revenue",
+    min(case when d.month = 'Jun' then d.revenue else null end) "Jun_Revenue",
+    min(case when d.month = 'Jul' then d.revenue else null end) "Jul_Revenue",
+    min(case when d.month = 'Aug' then d.revenue else null end) "Aug_Revenue",
+    min(case when d.month = 'Sep' then d.revenue else null end) "Sep_Revenue",
+    min(case when d.month = 'Oct' then d.revenue else null end) "Oct_Revenue",
+    min(case when d.month = 'Nov' then d.revenue else null end) "Nov_Revenue",
+    min(case when d.month = 'Dec' then d.revenue else null end) "Dec_Revenue"
+from department d
+group by d.id
+;
+
+*******************************************************************************
+If the preferred delivery date of the customer is the same as the order date
+then the order is called immediate otherwise it's called scheduled.
+
+Write an SQL query to find the percentage of immediate orders in the table,
+rounded to 2 decimal places:
+
+with
+t1 as (SELECT count(delivery_id) as total FROM Delivery),
+
+t2 as (select count(delivery_id) as id
+from Delivery d
+where d.customer_pref_delivery_date = d.order_date)
+
+select  round(t2.id*100/t1.total,2) as immediate_percentage FROM t1,t2;
+
+*******************************************************************************
+Query the customer_number from the orders table for the customer who has placed
+the largest number of orders.
+
+It is guaranteed that exactly one customer will have placed more orders than any other customer:
+
+select customer_number from orders
+group by customer_number
+having count(customer_number) >= all
+(select count(customer_number) from orders group by customer_number);
+
+*******************************************************************************
+Write an SQL query that reports the best seller by total sales price,
+If there is a tie, report them all:
+
+select seller_id
+from Sales
+group by seller_id
+having sum(price) = (select max(sum(price))
+                     from Sales
+                     group by seller_id);
+
+*******************************************************************************
+Write an SQL query to find the number of times each student attended each exam.
+
+select
+c.student_id,c.student_name,c.subject_name, sum(case when d.subject_name is null
+                                             then 0 else 1 end) attended_exams
+from
+(
+select a.student_id,a.student_name,b.subject_name
+from students a, subjects b
+) c
+left outer join examinations d
+on c.student_id = d.student_id
+and c.subject_name = d.subject_name
+group by c.student_id,c.student_name,c.subject_name
+order by c.student_id,c.subject_name
+
+*******************************************************************************
+Write an SQL query to find number of comments per each post.
+
+Result table should contain post_id and its corresponding number_of_comments, and must be sorted by post_id in ascending order.
+
+Submissions may contain duplicate comments. You should count the number of unique comments per post.
+
+Submissions may contain duplicate posts. You should treat them as one post:
+
+SELECT posts.sub_id as post_id, count(distinct comments.sub_id) as number_of_comments
+FROM (SELECT distinct sub_id FROM Submissions WHERE parent_id IS NULL) posts left join
+     (SELECT * FROM Submissions WHERE parent_id IS NOT NULL) comments
+on comments.parent_id = posts.sub_id
+GROUP by posts.sub_id
+ORDER by posts.sub_id;
+*******************************************************************************
+
+Could you help Tim by writing a query to judge whether these three sides can form a triangle,
+assuming table triangle holds the length of the three sides x, y and z:
+
+SELECT x,y,z,
+CASE
+ WHEN x+y > z AND greatest(x,y,z) = z THEN 'Yes'
+ WHEN y+z > x AND greatest(x,y,z) = x THEN 'Yes'
+ WHEN z+x > y AND greatest(x,y,z) = y THEN 'Yes'
+ ELSE 'No'
+END as triangle
+FROM triangle;
+
+*******************************************************************************
+
+Several friends at a cinema ticket office would like to reserve consecutive available seats.
+Can you help to query all the consecutive available seats order by the seat_id
+using the following cinema table?
+
+select distinct a.seat_id
+from cinema a join cinema b
+  on abs(b.seat_id - a.seat_id) = 1
+  and a.free = 1 and b.free = 1
+order by a.seat_id;
+
+*******************************************************************************
+Given three tables: salesperson, company, orders.
+Output all the names in the table salesperson, who didn’t have sales to company 'RED'.
+
+SELECT s.name
+FROM salesperson s
+WHERE s.sales_id NOT IN (SELECT o.sales_id
+                         FROM orders o, company c
+                         WHERE o.com_id = c.com_id(+)
+                         AND c.name = 'RED')
+
+*******************************************************************************
+A company is running Ads and wants to calculate the performance of each Ad.
+
+Performance of the Ad is measured using Click-Through Rate (CTR) where:
+
+Write an SQL query to find the ctr of each Ad.
+
+Round ctr to 2 decimal points. Order the result table by ctr in descending order
+and by ad_id in ascending order in case of a tie:
+
+select ad_id, round(nvl(avg(decode(action, 'Clicked', 1, 'Viewed', 0, null))*100, 0), 2) ctr
+from Ads
+group by ad_id
+order by 2 desc, 1 asc
+
+*******************************************************************************
+Write an SQL query that reports the buyers who have bought S8 but not iPhone.
+Note that S8 and iPhone are products present in the Product table:
+
+select distinct s.buyer_id from
+Product p, Sales s
+where p.product_id = s.product_id
+and p.product_name = 'S8'
+minus
+select distinct s.buyer_id from
+Product p, Sales s
+where p.product_id = s.product_id
+and p.product_name = 'iPhone'
+
+*******************************************************************************
+Table my_numbers contains many numbers in column num including duplicated ones.
+Can you write a SQL query to find the biggest number, which only appears once:
+
+SELECT max(num) as num
+FROM (
+SELECT num, count(num)
+FROM my_numbers
+GROUP BY num
+HAVING count(num) = 1);
+
+*******************************************************************************
+Write a query to find the overall acceptance rate of requests rounded to 2 decimals,
+which is the number of acceptance divide the number of requests:
+
+WITH
+t1 as
+(select count(*) as num from (select distinct requester_id, accepter_id from request_accepted)),
+t2 as
+(select count(*) as den from (select DISTINCT sender_id, send_to_id FROM friend_request))
+
+SELECT
+CASE
+WHEN t2.den=0 THEN 0.00
+ELSE round(t1.num/t2.den,2)
+END as accept_rate
+FROM t1,t2;
+
+*******************************************************************************
+Write an SQL query to find the average number of sessions per user for a period of 30 days
+ending 2019-07-27 inclusively, rounded to 2 decimal places. The sessions we want to count
+for a user are those with at least one activity in that time period:
+
+select nvl(round(count(distinct session_id) / count(distinct user_id),2),0) as average_sessions_per_user
+from Activity
+where activity_date between '2019-06-28' and '2019-07-27'
+having count(distinct user_id) > 0
+
+*******************************************************************************
+Write an SQL query to report the Capital gain/loss for each stock.
+
+The capital gain/loss of a stock is total gain or loss after buying and selling
+the stock one or many times:
+
+SELECT stock_name,
+       SUM(CASE WHEN operation = 'Sell' THEN price ELSE 0 END) -
+       SUM(CASE WHEN operation = 'Buy' THEN price ELSE 0 END) as capital_gain_loss
+FROM Stocks
+GROUP BY stock_name;
+
+*******************************************************************************
+Write an SQL query to find employee_id of all employees that directly or indirectly
+report their work to the head of the company.
+The indirect relation between managers will not exceed 3 managers as the company is small.
+Return result table in any order without duplicates.
+
+WITH STEP1 AS
+(SELECT employee_id FROM Employees WHERE manager_id = 1 AND employee_id <> manager_id),
+
+STEP2 AS
+(SELECT employee_id FROM Employees WHERE manager_id IN (SELECT * FROM STEP1)),
+
+STEP3 AS
+(SELECT employee_id FROM Employees WHERE manager_id IN (SELECT * FROM STEP2))
+
+SELECT employee_id FROM STEP1 UNION
+SELECT employee_id FROM STEP2 UNION
+SELECT employee_id FROM STEP3
+
+*******************************************************************************
+Write an SQL query to find the total score for each gender at each day.
+Order the result table by gender and day:
+
+select gender , to_char(day, 'YYYY-MM-DD') as day, sum(score_points)
+                                  over (partition by gender order by day) as total
+from Scores
 
 
 
-
-
+*******************************************************************************
