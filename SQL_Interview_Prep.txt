@@ -1,0 +1,45 @@
+** Delete & truncate:
+ -- Delete needs commit while truncate does not.
+ -- Truncate is faster than delete.
+ -- We can delete from 2 tables at the same time
+
+ ** Char datatype stores the data and pads spaces in left over spaces
+ ** Varchar2 stores only the data.
+ ** Bool datatype table cannot be created.
+
+ ** Substr - Used to extract a substring from a string
+ ** Instr - Used to return the location of a substring in a string
+
+ ** LPAD & RPAD are used to add padding characters to the left or right side of a string up to a given length
+
+ ** Different Date functions:
+    Months_Between
+    Last_Day
+    Next_Day
+    Add_Months
+    Extract
+
+** Difference between Decode and Case: (Both provide IF THEN ELSE functionality)
+   Decode is a simple switch comparing each argument against the first such..
+   Where as CASE allows you to do different tests with each WHEN clause.
+
+ **Any arithmatic function done with null result "NULL"
+ NVL is used to replace null values with default value
+ NVL2 accpets 3 parameters, if not null returns 2nd value and if null returns 3rd value
+ NUll IF - if both the values are null then returns null & if both values same then returns 1st value
+
+ COALESCE : it accepts two to more parameters and returns the first non null value.
+
+ ** When you create a primary key, by default a unique index is created.
+
+ ** On Delete Cascade:
+    A foreign key with cascade delete means that if a record in the parent table is
+    deleted then the corresponding records in the child table will automatically be deleted.
+
+Set operators:
+Union - returns all the unique rows
+Union all - returns all the rows including duplicates (Union all is faster than Union)
+Minus - Rows that are unique for the first query will be retrieved
+Intersect - common rows from both the queries will be retrieved.
+
+** Subquery that appears in FROM clause is called Inline View
