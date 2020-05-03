@@ -43,3 +43,68 @@ Minus - Rows that are unique for the first query will be retrieved
 Intersect - common rows from both the queries will be retrieved.
 
 ** Subquery that appears in FROM clause is called Inline View
+
+** We can create index, primary key, partitions  on virtual columns and
+   we cannot update data in virtual columns
+
+** Nested loop joins:
+   Driving row source is small and the joined columns of the inner row source are
+   uniquely indexed.
+   Typically for OLTP queries
+
+**Different Hints:
+  Index hints
+  Parallel hints
+
+** AWR(Automatic Workload Repository) is a built in repository in the Oracle DB
+   At regular intervals Oracle DB makes a snapshot of all of its vital statistics
+   and workload information and stores in the AWR.
+
+** TKPROF : Oracle DB utility used to format SQL trace output into human readable format
+   $ tkprof oracl102_ora_30987.trc output.prf EXPLAIN=scott/tiger SYS=NO
+
+** Various reasons an index can be suppressed:
+   - Using functions on an index columns
+   - performing arithmetic operations on index column
+   - Use of <> on an index column
+   - Use of concatenation operator || on an index column
+   - Comparing a character indexed column with a numeric value
+   - Use of IS NULL or IS NOT NULL
+
+** MV's:
+   Refresh types:
+     FAST
+     COMPLETE
+     FORCE
+  Refresh Methods:
+     ON COMMIT
+     ON DEMAND - most commonly used
+
+** Difference between View and MV:
+  - A views sql is executed at run time, while for mv the output is stored in db and the
+    query only browses the result.
+  - View occupies no space, while MV needs space.
+  - Views data is on the fly, real time data whereas MV data is not real time
+  - Hide implementation for complex query from user, use View, and when we want to build aggregate
+    tables from entire data use MV's.
+
+** PIVOT() : Converts row level data to column level using PIVOT
+** UNPIVOT(): Converts column level data to row level data
+
+** LISTAGG(): This function concatenates values of the row level columns for each GROUP based
+   on the ORDER BY clause
+
+** LAG() & LEAD(): Gives access to multiple rows within a table, without the need for a self join
+   LAG(): This function is used to access data from a previous row.
+   LEAD(): This function is used to return data from the next row.
+
+** In Rank() the sequence of the rank is not consecutive if 2 records are same but in Dense_Rank()
+   the sequence of the rank is consecutive.
+
+**LOB:
+  Internal LOB:
+   - CLOB
+   - NCLOB
+   - BLOB
+  External LOB:
+   - BFILE
